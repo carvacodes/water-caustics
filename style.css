@@ -1,0 +1,92 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgb(94, 85, 121);
+  background-color: rgb(63, 51, 104);
+  overflow: hidden;
+  text-align: center;
+}
+
+.container {
+  width: inherit;
+  height: inherit;
+  overflow: hidden;
+  clip-path: margin-box;
+  margin: 0 auto;
+  position: relative;
+}
+
+.surface, .water-column {
+  position: absolute;
+  width: inherit;
+  height: inherit;
+}
+
+.surface {
+  transform-origin: 13% 13%;
+  animation: 18s rotate 0s linear infinite;
+}
+
+.caustic, .interactive-caustic {
+  background-color: transparent;
+  position: absolute;
+  mix-blend-mode: plus-lighter;
+}
+
+.caustic {
+  border-radius: 20%;
+  animation-name: rotateAndJitter, bRadius;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.interactive-caustic {
+  width: 1px;
+  height: 1px;
+  border-radius: 50%;
+  animation-name: droplet;
+  animation-iteration-count: 1;
+  animation-timing-function: linear;
+  animation-duration: 1s;
+}
+
+@keyframes rotateAndJitter {
+  0% {
+    transform: rotate(0deg) translateX(0px);
+  }
+  50% {
+    transform: rotate(180deg) translateX(20px);
+  }
+  100% {
+    transform: rotate(360deg) translateX(0px);
+  }
+}
+
+@keyframes bRadius {
+  0% {
+    border-radius: 30%;
+  }
+  50% {
+    border-radius: 40%;
+  }
+  100% {
+    border-radius: 30%;
+  }
+}
+
+@keyframes droplet {
+  0% {
+    width: 1px;
+    height: 1px;
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+  100% {
+    width: 700px;
+    height: 700px;
+    opacity: 0;
+    transform: translateX(-250px) translateY(-250px);
+  }
+}
