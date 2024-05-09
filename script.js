@@ -1,10 +1,9 @@
-let sizeFactor = 12;  // ties the size and spacing together nicely
-let minSize = Math.max(innerWidth, innerHeight) / 100 * sizeFactor;   // minimum size of elements;
-let cSpacing = Math.min(innerWidth, innerHeight) / 100 * sizeFactor;  // spacing of the elements
+let sizeFactor = Math.max(30 - (Math.max(innerWidth, innerHeight) / 100), 12);  // ties the size and spacing together nicely
+let minSize = Math.round(Math.min(innerWidth, innerHeight) / 110) * sizeFactor;   // minimum size of elements;
+let cSpacing = Math.round(Math.min(innerWidth, innerHeight) / 95) * sizeFactor;  // spacing of the elements
 let cStrength = 11; // implemented as border-radius
 let minAlpha = 0.75; // implemented as alpha value in hsla
 let minTime = 6;    // minimum amount of time a rotation takes
-let blur = 10;      // allows setting the blur here; mostly a convenience, as this can be hard-coded in the CSS file
 let container = document.getElementsByClassName('container')[0];  // our container element
 let rippleDelay = Date.now(); // grab the current time; this variable will space out ripples formed by clicks/taps or movement
 
@@ -22,7 +21,6 @@ class Caustic {
     this.el.style.animationDuration = `${Math.ceil((randFactor) * 12) + minTime}s`;
     if (randFactor < 0.5) { this.el.style.animationDirection = 'reverse'; }
     this.el.style.border = `${cStrength}px solid hsla(270, 100%, 85%, ${(randFactor * (0.9 - minAlpha)) + minAlpha})`;
-    this.el.style.filter = `blur(${blur}px)`;
     this.el.className = 'caustic';
     container.appendChild(this.el);
   }

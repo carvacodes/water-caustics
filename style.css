@@ -12,19 +12,9 @@ body {
 .container {
   width: inherit;
   height: inherit;
-  overflow: hidden;
-  clip-path: margin-box;
-  margin: 0 auto;
-  position: relative;
-}
-
-.surface, .water-column {
   position: absolute;
   width: inherit;
   height: inherit;
-}
-
-.surface {
   transform-origin: 13% 13%;
   animation: 18s rotate 0s linear infinite;
 }
@@ -33,6 +23,7 @@ body {
   background-color: transparent;
   position: absolute;
   mix-blend-mode: plus-lighter;
+  filter: blur(10px);
 }
 
 .caustic {
