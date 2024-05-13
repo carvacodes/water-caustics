@@ -1,45 +1,154 @@
-body {
+* {
   margin: 0;
   padding: 0;
+  font-family: 'Quicksand', sans-serif;
+}
+
+html, body {
   width: 100vw;
   height: 100vh;
-  background-color: rgb(94, 85, 121);
-  background-color: rgb(63, 51, 104);
   overflow: hidden;
-  text-align: center;
 }
 
-.container {
-  width: inherit;
-  height: inherit;
-  position: absolute;
-  width: inherit;
-  height: inherit;
-  transform-origin: 13% 13%;
-  animation: 18s rotate 0s linear infinite;
+
+/********************/
+/*     Controls     */
+/********************/
+
+.controls {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-items: stretch;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.8);
 }
 
-.caustic, .interactive-caustic {
-  background-color: transparent;
-  position: absolute;
-  mix-blend-mode: plus-lighter;
-  filter: blur(10px);
+.control-group {
+  width: 100%;
+  padding: 10px;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: thin solid black;
+  border-collapse: collapse;
+}
+
+.control-group:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#menuToggle.collapsed::after {
+  position: fixed;
+  right: 5px;
+  top: 0;
+  height: 2rem;
+  content: '...';
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#menuToggle.expanded::after {
+  position: fixed;
+  right: 8px;
+  top: 12px;
+  height: 2rem;
+  content: '^';
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+#menuToggle.collapsed ~ .control-group:not(.selecting) {
+  display: none;
+}
+
+#menuToggle.expanded ~ .control-group {
+  display: flex;
+}
+
+.control-group .input-elements {
+  display: none;
+}
+
+.control-group.selecting .input-elements {
+  display: flex;
+}
+
+.input-elements {
+  flex-direction: column;
+}
+
+.input[type="range"] {
+  box-shadow: inset 1px 1px 3px black;
+}
+
+button {
+  background-color: yellow;
+  color: black;
+  border-style: none;
+  height: 1.5rem;
+  margin-top: 5px;
+}
+
+/**********************************/
+/*     Container and Caustics     */
+/**********************************/
+
+.background-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: hsla(180, 57%, 32%);
+  opacity: 1;
+  filter: brightness(2) contrast(3);
+}
+
+.caustic-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  top: 0;
+  left: 0;
+  filter: blur(12px);
 }
 
 .caustic {
-  border-radius: 20%;
-  animation-name: rotateAndJitter, bRadius;
+  position: absolute;
+  border-radius: 35%;
+  border-width: 4px;
+  border-style: solid;
+  border-color: hsl(240, 100%, 85%);
+  animation-name: rotateAndJitter;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
 
 .interactive-caustic {
-  width: 1px;
-  height: 1px;
+  z-index: 1000;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  animation-name: droplet;
+  border: 1.1px solid hsla(180, 100%, 100%, 0.45);
+  opacity: 0;
+}
+
+
+/**********************/
+/*     Animations     */
+/**********************/
+
+.animating-ripple {
+  animation-name: ripple;
   animation-iteration-count: 1;
-  animation-timing-function: linear;
+  animation-timing-function: ease-out;
   animation-duration: 1s;
 }
 
@@ -55,29 +164,13 @@ body {
   }
 }
 
-@keyframes bRadius {
+@keyframes ripple {
   0% {
-    border-radius: 30%;
-  }
-  50% {
-    border-radius: 40%;
-  }
-  100% {
-    border-radius: 30%;
-  }
-}
-
-@keyframes droplet {
-  0% {
-    width: 1px;
-    height: 1px;
     opacity: 1;
-    transform: translateX(0) translateY(0);
+    transform: scale(0.1);
   }
   100% {
-    width: 700px;
-    height: 700px;
     opacity: 0;
-    transform: translateX(-250px) translateY(-250px);
+    transform: scale(40);
   }
 }
