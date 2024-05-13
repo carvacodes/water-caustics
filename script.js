@@ -119,19 +119,20 @@ let resetToDefaultsButton = document.getElementById('resetToDefaults');
 window.addEventListener('load', init);
 window.addEventListener('click', (event) => {
   let t = event.target;
-  if (t.classList.contains('control-group') || t.tagName == 'P') {
+  if (t.classList.contains('control-group') || t.tagName == 'P' || t.tagName == 'INPUT') {
     event.preventDefault();
-      if (t.id == 'menuToggle') {
+    if (t.tagName == 'LABEL' || t.tagName == 'INPUT') {
+      return;
+    }
+    if (t.id == 'menuToggle') {
       let selectingElement = t.parentElement.querySelector('.selecting');
       if (selectingElement) {
         t.parentElement.querySelector('.selecting').classList.remove('selecting');
       }
-    } else if (t.classList.contains('control-group')) {
+    } else if (t.classList.contains('control-group') && !t.classList.contains('selecting')) {
       t.classList.toggle('selecting');
     } else if (t.tagName == 'P') {
       t.parentElement.classList.toggle('selecting');
-    } else if (t.tagName == 'LABEL') {
-      return;
     }
     menuToggle.classList.toggle('collapsed');
     menuToggle.classList.toggle('expanded');
