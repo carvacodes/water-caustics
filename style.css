@@ -84,6 +84,17 @@ html, body {
   box-shadow: inset 1px 1px 3px black;
 }
 
+.input-with-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+}
+
+label {
+  margin-right: 0.25rem;
+}
+
 button {
   background-color: rgb(126, 212, 118);
   color: black;
