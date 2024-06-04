@@ -1,20 +1,24 @@
 /////////////////////
+//                 //
 //     Globals     //
+//                 //
 /////////////////////
 
-let minSize = 132;   // minimum size of elements;
-let cSpacing = 132;  // spacing of the elements
-let cStrength = 4;   // implemented as border-radius
-let cAlphaAdjust = 0.2;  // the max amount less than 1 that a caustic's alpha value can be
-let minTime = 3;     // minimum amount of time a rotation takes
-let minRippleTime = 60; // the minimum amount of time between InteractiveCaustic animations (ripples)
-let rippleDelay = performance.now(); // grab the current time; this variable will space out ripples formed by clicks/taps or movement
-let _w = window.innerWidth;
-let _h = window.innerHeight;
-let interactiveCaustics = [];
+let minSize = 132;                    // minimum size of elements;
+let cSpacing = 132;                   // spacing of the caustics (overall, controls caustic density)
+let cStrength = 4;                    // implemented as border-radius, this controls the overall effect of a caustic's presence on the end visual
+let cAlphaAdjust = 0.2;               // the max amount less than 1 that a caustic's alpha value can be
+let minTime = 3;                      // minimum amount of time a caustic's rotation takes (controls the speed of the overall water surface ripple effect)
+let minRippleTime = 60;               // the minimum amount of time between InteractiveCaustic animations (ripples)
+let rippleDelay = performance.now();  // grab the current time; this variable will space out ripples formed by clicks/taps or movement
+let _w = window.innerWidth;           // unlike with canvas animations, no need to adjust width/height by device pixel ratio
+let _h = window.innerHeight;          // unlike with canvas animations, no need to adjust width/height by device pixel ratio
+let interactiveCaustics = [];         // holds the total set of interactive caustics
 
 /////////////////////
+//                 //
 //     Classes     //
+//                 //
 /////////////////////
 
 // Even though we only touch these elements once (on instantiation), this makes it way easier to create them initially
@@ -38,15 +42,18 @@ class Caustic {
 
 class InteractiveCaustic {
   constructor() {
-    this.positionalContainer = document.createElement('DIV');
-    this.positionalContainer.style.width = '1px';
-    this.positionalContainer.style.height = '1px';
+    this.positionalContainer = document.createElement('DIV');   // an interactive caustic's positionalContainer is the 1x1 px div that holds the caustic
+    this.positionalContainer.style.width = '1px';               // using this makes it easier to center the caustic on the user, since the containing
+    this.positionalContainer.style.height = '1px';              // div element's position doesn't change while its internal caustic animates
     this.x = 0;
     this.y = 0;
     this.el = document.createElement('DIV');
     this.el.classList.add('interactive-caustic');
     this.animating = false;
 
+    // at the end of an interactive caustic's animation, remove its .animating-ripple class and set its opacity to 0 (to ensure that elements that have completed animating don't hang around the page).
+    // this will allow the animation to restart when the class is added back.
+    // this listener is set here in the object constructor to ensure it's properly attached
     this.el.addEventListener('animationend', ()=>{
       this.el.style.opacity = '0';
       this.el.classList.remove('animating-ripple');
@@ -57,10 +64,12 @@ class InteractiveCaustic {
     causticContainer.appendChild(this.positionalContainer);
   }
 
+  // center the caustic on the user's interaction position. the value of 50 here is derived from the .interactive-caustic class width of 100px; this can be obtained by getting computed styles for a class member from the window, but hard-coding that here skips that step for convenience.
   jumpTo(x,y) {
-    this.positionalContainer.style.transform = `translateX(${x}px) translateY(${y}px)`;
+    this.positionalContainer.style.transform = `translateX(${x - 50}px) translateY(${y - 50}px)`;
   }
 
+  // on an animation call, immediately set the element to full opacity and add back the .animating-ripple class
   animate() {
     this.el.style.opacity = '1';
     this.el.classList.add('animating-ripple');
@@ -69,7 +78,9 @@ class InteractiveCaustic {
 }
 
 /////////////////
+//             //
 //     DOM     //
+//             //
 /////////////////
 
 // control elements
@@ -77,7 +88,7 @@ let menuToggle = document.getElementById('menuToggle');
 let controlMenu = document.getElementById('controlMenu');
 let rangeControls = controlMenu.querySelectorAll('input[type="range"]');
 
-// ID'd containers
+// containers with IDs
 let backgroundContainer = document.getElementById('backgroundContainer');
 let causticContainer = document.getElementById('causticContainer');
 
@@ -97,18 +108,14 @@ let causticStrengthInput = document.getElementById('causticStrength');
 let causticColorHueInput = document.getElementById('causticColorHue');
 let causticColorSatInput = document.getElementById('causticColorSat');
 let causticColorLitInput = document.getElementById('causticColorLit');
-let rippleStrengthInput = document.getElementById('rippleStrength');
-let rippleColorCompiledInput = document.getElementById('rippleColorCompiledInput');
-let rippleColorHueInput = document.getElementById('rippleColorHue');
-let rippleColorSatInput = document.getElementById('rippleColorSat');
-let rippleColorLitInput = document.getElementById('rippleColorLit');
-let rippleColorAlphaInput = document.getElementById('rippleColorAlpha');
 
 // buttons
 let resetToDefaultsButton = document.getElementById('resetToDefaults');
 
 ////////////////////////////////////
+//                                //
 //     Listeners and Handlers     //
+//                                //
 ////////////////////////////////////
 
 
@@ -119,40 +126,27 @@ let resetToDefaultsButton = document.getElementById('resetToDefaults');
 window.addEventListener('load', init);
 window.addEventListener('click', (event) => {
   let t = event.target;
-  if (t.classList.contains('control-group') || t.tagName == 'P' || t.tagName == 'INPUT') {
+  let tp = t.parentElement;
+  if (t.id == 'menuToggle' || tp.id == 'menuToggle') {
     event.preventDefault();
-    if (t.tagName == 'LABEL' || t.tagName == 'INPUT') {
-      return;
-    }
-    if (t.id == 'menuToggle') {
-      let selectingElement = t.parentElement.querySelector('.selecting');
-      if (selectingElement) {
-        t.parentElement.querySelector('.selecting').classList.remove('selecting');
-      }
-    } else if (t.classList.contains('control-group') && !t.classList.contains('selecting')) {
-      t.classList.toggle('selecting');
-    } else if (t.tagName == 'P') {
-      t.parentElement.classList.toggle('selecting');
-    }
-    menuToggle.classList.toggle('collapsed');
-    menuToggle.classList.toggle('expanded');
-  } else {
-    menuToggle.classList.remove('expanded');
-    menuToggle.classList.add('collapsed');
-    let selecting = controlMenu.querySelector('.selecting');
-    if (selecting) { selecting.classList.remove('selecting'); }
-    animateInteractiveCaustic(event);
+    toggleMenu();
   }
 });
 window.addEventListener('mousemove', handleMove)
 window.addEventListener('touchmove', handleMove, {passive: false})
-window.addEventListener('orientationchange', ()=>{
-  location.reload();
+window.addEventListener('resize', ()=>{
+  window.location.reload();
 })
 
-/////////////////////////////////////////////////////
-//     Element-Specific Listeners and Handlers     //
-/////////////////////////////////////////////////////
+/*
+Input listeners and handlers (below) in this project were an interesting case. Each input changes a CSS style rule for one or more elements. It's exceptionally inefficient to set the same style on (potentially very) many elements, but it's also impossible to edit class-wide CSS on the fly (the external stylesheet, style.css in this case, can't be directly modified).
+
+The compromise is to dynamically create or update new style rules for each input value that are defined in the document's <head> <style> tag. Using regular expressions, the same style can be edited multiple times without adding an extreme amount of bloat to the CSS stylesheet or per-element (essentially inline) style definitions.
+*/
+
+/////////////////////////////////////////////////
+//     Background Input Listeners/Handlers     //
+/////////////////////////////////////////////////
 
 backgroundBgColorHueInput.addEventListener('change', recalculateBgColor);
 backgroundBgColorSatInput.addEventListener('change', recalculateBgColor);
@@ -177,12 +171,10 @@ function recalculateBgFilters() {
   backgroundContainer.style.filter = filterString;
 }
 
-backgroundOpacityInput.addEventListener('change', recalculateBgOpacity);
 
-function recalculateBgOpacity() {
-  let o = backgroundOpacityInput.value;
-  backgroundContainer.style.opacity = o;
-}
+//////////////////////////////////////////////
+//     Caustic Input Listeners/Handlers     //
+//////////////////////////////////////////////
 
 causticBlurInput.addEventListener('change', recalculateCausticBlur)
 
@@ -209,41 +201,22 @@ causticStrengthInput.addEventListener('change', setCausticDomStyles);
 
 function setCausticDomStyles() {
   let s = document.head.querySelector('style');
-  let color = `border-color: ${causticColorCompiledInput.value}`;
-  let borderWidth = `border-width: ${causticStrengthInput.value}px`;
-  let newRule = `.caustic { ${borderWidth}; ${color}; }`;
-  let regex = /\.caustic.*/;
-  s.innerHTML = s.innerHTML.replace(regex, newRule);
+  let causticColor = `border-color: ${causticColorCompiledInput.value}`;
+  let causticBorderWidth = `border-width: ${causticStrengthInput.value}px`;
+  let intCausticBorderWidth = `border-width: ${Math.min(40, causticStrengthInput.value * 2)}px`;
+  let causticNewRule = `.caustic { ${causticBorderWidth}; ${causticColor}; }`;
+  let causticRegex = /\.caustic.*/;
+  s.innerHTML = s.innerHTML.replace(causticRegex, causticNewRule);
+
+  let intCausticNewRule = `.interactive-caustic { ${intCausticBorderWidth}; ${causticColor}; }`;
+  let intCausticRegex = /\.interactive-caustic.*/;
+  s.innerHTML = s.innerHTML.replace(intCausticRegex, intCausticNewRule);
 }
 
-rippleColorHueInput.addEventListener('change', recalculateRippleColor);
-rippleColorSatInput.addEventListener('change', recalculateRippleColor);
-rippleColorLitInput.addEventListener('change', recalculateRippleColor);
-rippleColorAlphaInput.addEventListener('change', recalculateRippleColor);
 
-function recalculateRippleColor() {
-  let h = rippleColorHueInput.value;
-  let s = rippleColorSatInput.value;
-  let l = rippleColorLitInput.value;
-  let a = rippleColorAlphaInput.value;
-  let colorString = `hsla(${h}, ${s}%, ${l}%, ${a})`;
-  rippleColorCompiledInput.value = colorString;
-  // need to get this into the DOM <style> tag as border-color
-  setRippleDomStyles();
-}
-
-rippleStrengthInput.addEventListener('change', setRippleDomStyles);
-
-function setRippleDomStyles() {
-  let s = document.head.querySelector('style');
-  let color = `border-color: ${rippleColorCompiledInput.value}`;
-  let borderWidth = `border-width: ${rippleStrengthInput.value}px`;
-  let newRule = `.interactive-caustic { ${borderWidth}; ${color}; }`;
-  let regex = /\.interactive-caustic.*/;
-  s.innerHTML = s.innerHTML.replace(regex, newRule);
-
-  animateInteractiveCaustic({clientX: _w / 2, clientY: _h / 2});
-}
+//////////////////////////////////////////
+//     Reset Button Listener/Handler    //
+//////////////////////////////////////////
 
 resetToDefaultsButton.addEventListener('click', resetToDefaults);
 
@@ -253,21 +226,54 @@ function resetToDefaults() {
     r.value = r.getAttribute('data-default-value');
     r.dispatchEvent(new Event("change"));
   }
-  menuToggle.classList.add('collapsed');
-  menuToggle.classList.remove('expanded');
-  let selectingElement = controlMenu.querySelector('.selecting');
-  if (selectingElement) {
-    controlMenu.querySelector('.selecting').classList.remove('selecting');
+}
+
+// for mouse and touch movement:
+// 1. create an interactive caustic (a ripple) centered at the user's interaction position if they touched the main page
+// 2. toggle the menu open/closed if the user tapped on the main menu bar
+// 3. adjust scene styles in real time as the user drags an input
+function handleMove(event) {
+  if (event.target.classList.contains('control-group') || event.target.tagName == 'INPUT') {
+    let e = new InputEvent('change', {
+      view: window,
+      bubbles: false,
+      cancelable: true
+    });
+    event.target.dispatchEvent(e);
+    return;
+  }
+  event.preventDefault();
+  
+  if (event.changedTouches) {
+    event = event.touches[0];
+  }
+
+  let now = performance.now();
+  if (now - rippleDelay < minRippleTime) { return; }
+  rippleDelay = now;
+  animateInteractiveCaustic(event);
+}
+
+// a helper function to toggle the menu open/closed
+function toggleMenu() {
+  if (menuToggle.classList.contains('expanded')) {
+    menuToggle.classList.remove('expanded');
+    menuToggle.classList.add('collapsed');
+  } else {
+    menuToggle.classList.remove('collapsed');
+    menuToggle.classList.add('expanded');
   }
 }
 
+
 ///////////////////////
+//                   //
 //     Functions     //
+//                   //
 ///////////////////////
 
 function init() {
-  // Based on the fact that the animation takes 1s, and the delay between ripples is 60ms, there will never be need for more than about 20 of these.
-  // Thus, populate the interactive caustics array with 20 elements.
+  // populate the interactive caustics array with 20 elements (more are created as needed, but this should be enough)
   for (let i = 0; i < (1000 / minRippleTime) + 4; i++) {
     interactiveCaustics.push(new InteractiveCaustic());
   }
@@ -293,36 +299,20 @@ function animateInteractiveCaustic(event) {
   // if there are no interactiveCaustics left in the array, add one more
   for (let i = 0; i < interactiveCaustics.length; i++) {
     let intC = interactiveCaustics[i];
+    // if we've reached the end of the array and the final item is animating, create a new one
     if (intC.animating && i == interactiveCaustics.length - 1) {
-      // create a new interactiveCaustic
       let newIntC = new InteractiveCaustic();
       interactiveCaustics.push(newIntC);
       newIntC.jumpTo(event.clientX, event.clientY);
       newIntC.animate();
-      break;  // gotta break here!
+      break;    // animate no more caustics on a loop where a new one was created
     } else if (intC.animating) {
-      continue; // this item is already animating; keep looking
+      continue; // this item is already animating and we're not at the end of the array; keep looking
     } else {
+      // found a non-animating interactive caustic; center it on the user's interaction position and animate it
       intC.jumpTo(event.clientX, event.clientY);
       intC.animate();
       break;
     }
   }
-}
-
-// on mouse or touch move, check if the ripple delay timer is 0 and animate if so
-function handleMove(event) {
-  if (event.target.classList.contains('control-group') || event.target.tagName == 'INPUT') {
-    return;
-  }
-  event.preventDefault();
-  
-  if (event.changedTouches) {
-    event = event.touches[0];
-  }
-
-  let now = performance.now();
-  if (now - rippleDelay < minRippleTime) { return; }
-  rippleDelay = now;
-  animateInteractiveCaustic(event);
 }

@@ -9,29 +9,24 @@
     </head>
     <body>
         <div class="controls" id="controlMenu">
-            <div id="menuToggle" class="control-group collapsed">
+            <div id="menuToggle" class="control-group control-group-header collapsed">
                 <p>Controls</p>
+                <p></p>
             </div>
             <div class="control-group">
-                <p>Background Brightness</p>
+                <p>Base Water Brightness</p>
                 <div class="input-elements">
                     <input type="range" min="0.5" max="4.5" step="0.01" value="2" data-default-value="2" id="backgroundBrightness">
                 </div>
             </div>
             <div class="control-group">
-                <p>Background Contrast</p>
+                <p>Base Water Contrast</p>
                 <div class="input-elements">
                     <input type="range" min="0" max="20" step="0.1" value="3" data-default-value="3" id="backgroundContrast">
                 </div>
             </div>
-            <div class="control-group">
-                <p>Background Opacity</p>
-                <div class="input-elements">
-                    <input type="range" min="0" max="1" step="0.01" value="1" data-default-value="1" id="backgroundOpacity">
-                </div>
-            </div>
             <div class="control-group selecting">
-                <p>Background Color</p>
+                <p>Base Water Color</p>
                 <div class="input-elements">
                     <input type="hidden" value="" id="backgroundBgColorCompiledInput" />
                     <label for="backgroundBgColorHue">Hue</label><input type="range" min="0" max="360" step="1" value="180" data-default-value="180" id="backgroundBgColorHue">
@@ -58,22 +53,6 @@
                     <label for="causticColorHue">Hue</label><input type="range" min="0" max="360" step="1" value="240" data-default-value="240" id="causticColorHue">
                     <label for="causticColorSat">Saturation</label><input type="range" min="0" max="100" step="0.1" value="100" data-default-value="100" id="causticColorSat">
                     <label for="causticColorLit">Lightness</label><input type="range" min="0" max="100" step="0.1" value="85" data-default-value="85" id="causticColorLit">                                        
-                </div>
-            </div>
-            <div class="control-group">
-                <p>Ripple Strength</p>
-                <div class="input-elements">
-                    <input type="range" min="0" max="3" step="0.02" value="1.1" data-default-value="1.1" id="rippleStrength">
-                </div>
-            </div>
-            <div class="control-group">
-                <p>Ripple Color</p>
-                <div class="input-elements">
-                    <input type="hidden" value="" id="rippleColorCompiledInput" />
-                    <label for="rippleColorHue">Hue</label><input type="range" min="0" max="360" step="1" value="180" data-default-value="180" id="rippleColorHue">
-                    <label for="rippleColorSat">Saturation</label><input type="range" min="0" max="100" step="0.1" value="100" data-default-value="100" id="rippleColorSat">
-                    <label for="rippleColorLit">Lightness</label><input type="range" min="0" max="100" step="0.1" value="100" data-default-value="100" id="rippleColorLit">
-                    <label for="rippleColorAlpha">Alpha</label><input type="range" min="0" max="1" step="0.01" value="0.45" data-default-value="0.45" id="rippleColorAlpha">
                 </div>
             </div>
             <div class="control-group">

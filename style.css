@@ -8,6 +8,7 @@ html, body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  user-select: none;
 }
 
 
@@ -27,7 +28,7 @@ html, body {
   align-items: stretch;
   justify-items: stretch;
   justify-content: center;
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0,0,0,0.7);
 }
 
 .control-group {
@@ -42,9 +43,8 @@ html, body {
   border-collapse: collapse;
 }
 
-.control-group:hover {
+#menuToggle:hover, input:hover, button:hover {
   cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 #menuToggle.collapsed::after {
@@ -62,29 +62,22 @@ html, body {
   right: 8px;
   top: 12px;
   height: 2rem;
-  content: '^';
-  font-size: 1.5rem;
+  content: '\2716';
   font-weight: normal;
 }
 
-#menuToggle.collapsed ~ .control-group:not(.selecting) {
+#menuToggle.collapsed ~ .control-group:not(:first-child) {
   display: none;
 }
 
-#menuToggle.expanded ~ .control-group {
-  display: flex;
-}
-
-.control-group .input-elements {
-  display: none;
-}
-
-.control-group.selecting .input-elements {
+#menuToggle.expanded ~ .control-group:not(:first-child) {
   display: flex;
 }
 
 .input-elements {
   flex-direction: column;
+  flex: 0;
+  text-align: center;
 }
 
 .input[type="range"] {
@@ -92,11 +85,18 @@ html, body {
 }
 
 button {
-  background-color: yellow;
+  background-color: rgb(126, 212, 118);
   color: black;
   border-style: none;
   height: 1.5rem;
   margin-top: 5px;
+  padding: 5px;
+  min-width: 6rem;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: rgb(140, 175, 240);
 }
 
 /**********************************/
@@ -133,10 +133,10 @@ button {
 
 .interactive-caustic {
   z-index: 1000;
-  width: 10px;
-  height: 10px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  border: 1.1px solid hsla(180, 100%, 100%, 0.45);
+  border: 8px solid hsla(180, 100%, 100%, 0.45);
   opacity: 0;
 }
 
@@ -171,6 +171,6 @@ button {
   }
   100% {
     opacity: 0;
-    transform: scale(40);
+    transform: scale(3);
   }
 }
